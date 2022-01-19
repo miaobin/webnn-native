@@ -1669,15 +1669,13 @@ namespace webnn_native { namespace dml {
         }
 
         ::dml::FusedActivation fActivation, gActivation;
-        if (options->activations.resetGateActivation == nullptr) {
+        if (options->activations == nullptr) {
             fActivation = ::dml::FusedActivation::Sigmoid();
-        } else {
-            fActivation = CreateFusedActivation(options->activations.resetGateActivation);
-        }
-        if (options->activations.newGateActivation == nullptr) {
             gActivation = ::dml::FusedActivation::Tanh();
         } else {
-            gActivation = CreateFusedActivation(options->activations.newGateActivation);
+            Ref<OperatorArrayBase> activationArray = gru->GetActivations();
+            fActivation = CreateFusedActivation(activationArray.Get()->Get(0));
+            gActivation = CreateFusedActivation(activationArray.Get()->Get(1));
         }
         std::vector<::dml::FusedActivation> activations;
         if (direction ==
